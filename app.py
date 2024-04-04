@@ -11,7 +11,7 @@ app = Flask(__name__)
 orca = pvorca.create(access_key='89BlxJKCyiH/Eye4zhS74DxMibVpYlj/6qkLLw90NCm+ICw+AKYZqg==')
 
 def play_audio(filename):
-    pygame.mixer.init()
+    pygame.mixer.init(driver='dummy')
     pygame.mixer.music.load(filename)
     pygame.mixer.music.play()
 
@@ -21,6 +21,7 @@ def play_audio(filename):
     pygame.mixer.quit()
 
     os.remove(filename)
+
 
 def number_to_words(num):
     ones = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine']
