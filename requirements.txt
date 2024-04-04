@@ -1,3 +1,9 @@
 Flask
 Gunicorn
-pyttsx3
+pandas
+SpeechRecognition
+spacy
+pvorca
+pygame
+flask
+scikit-learn
