@@ -8,4 +8,4 @@ spacy-loggers==1.0.5
 pvorca==0.1.4
 pygame==2.5.2
 scikit-learn==1.4.1.post1
-Gunicorn
+gunicorn
