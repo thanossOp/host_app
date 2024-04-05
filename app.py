@@ -499,3 +499,7 @@ def insurance_appFun():
         speak(f"Thank you {user_name} for co-operate with us and sharing all informations. It will help us find the best health insurance plan for you.")
         
         return jsonify({"message": "Script executed successfully"})
+    
+    
+if __name__ == "__main__":
+    app.run(debug=True)
