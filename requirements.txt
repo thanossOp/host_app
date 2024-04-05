@@ -5,5 +5,4 @@ SpeechRecognition
 spacy
 pvorca
 pygame
-flask
 scikit-learn
