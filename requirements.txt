@@ -1,8 +1,10 @@
-Flask
-Gunicorn
-pandas
-SpeechRecognition
-spacy
-pvorca
-pygame
-scikit-learn
+Flask==3.0.2
+pandas==1.5.3
+SpeechRecognition==3.10.3
+en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.1/en_core_web_sm-3.7.1-py3-none-any.whl
+spacy==3.7.4
+spacy-legacy==3.0.12
+spacy-loggers==1.0.5
+pvorca==0.1.4
+pygame==2.5.2
+scikit-learn==1.4.1.post1
