@@ -346,7 +346,7 @@ def extract_name():
         else:
             return None
 
-@app.route('/insurance', methods=['POST'])
+@app.route('/insurance', methods=['GET'])
 def insurance_appFun():
     
     speak("What is You name?")
