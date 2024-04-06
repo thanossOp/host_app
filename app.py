@@ -12,6 +12,7 @@ import pvorca
 import pygame
 import time
 from flask import Flask, jsonify
+import pyttsx3
 
 app = Flask(__name__)
 
@@ -98,13 +99,13 @@ def replace_numbers_with_words(input_text):
 
 
 def speak(response):
-    # engine = pyttsx3.init()
-    # voice = engine.getProperty("voices")
-    # engine.setProperty("voice", voice[1].id)
-    # engine.setProperty('rate', 180)
-    # engine.setProperty("volume", 0.9)
-    # engine.say(response)
-    # engine.runAndWait()
+    engine = pyttsx3.init()
+    voice = engine.getProperty("voices")
+    engine.setProperty("voice", voice[1].id)
+    engine.setProperty('rate', 180)
+    engine.setProperty("volume", 0.9)
+    engine.say(response)
+    engine.runAndWait()
     # audio_generator = elevenlabs.generate(
     #     api_key="d8a4a893da272449911c7783faefe392",
     #     text=response,
@@ -122,11 +123,11 @@ def speak(response):
 
     # play_audio("audio.mp3")
     
-    newText = replace_numbers_with_words(response)
+    # newText = replace_numbers_with_words(response)
     
-    orca.synthesize_to_file(newText,"output.wav")
+    # orca.synthesize_to_file(newText,"output.wav")
 
-    play_audio("output.wav")
+    # play_audio("output.wav")
 #     log_interaction(f"AI said: {newText}")
 
 
