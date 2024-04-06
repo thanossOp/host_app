@@ -16,44 +16,44 @@ import pyttsx3
 
 app = Flask(__name__)
 
-# current_session_file_path = None
+current_session_file_path = None
 
 orca = pvorca.create(access_key='89BlxJKCyiH/Eye4zhS74DxMibVpYlj/6qkLLw90NCm+ICw+AKYZqg==')
 
-# def log_interaction(log_text):
-#     global current_session_file_path
+def log_interaction(log_text):
+    global current_session_file_path
 
-#     if current_session_file_path is None:
-#         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-#         folder_path = "data_recording"
+    if current_session_file_path is None:
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        folder_path = "data_recording"
 
-#         if not os.path.exists(folder_path):
-#             os.makedirs(folder_path)
+        if not os.path.exists(folder_path):
+            os.makedirs(folder_path)
 
-#         current_session_file_path = os.path.join(
-#             folder_path, f"interaction_log_{timestamp}.txt"
-#         )
+        current_session_file_path = os.path.join(
+            folder_path, f"interaction_log_{timestamp}.txt"
+        )
 
-#     with open(current_session_file_path, "a") as log_file:
-#         log_file.write(f"{log_text}\n")
-
-
-# def restart_session():
-#     global current_session_file_path
-#     current_session_file_path = None
+    with open(current_session_file_path, "a") as log_file:
+        log_file.write(f"{log_text}\n")
 
 
-# def play_audio(filename):
-#     pygame.mixer.init()
-#     pygame.mixer.music.load(filename)
-#     pygame.mixer.music.play()
+def restart_session():
+    global current_session_file_path
+    current_session_file_path = None
 
-#     while pygame.mixer.music.get_busy():
-#         time.sleep(0.1)
 
-#     pygame.mixer.quit()
+def play_audio(filename):
+    pygame.mixer.init()
+    pygame.mixer.music.load(filename)
+    pygame.mixer.music.play()
 
-#     os.remove(filename)
+    while pygame.mixer.music.get_busy():
+        time.sleep(0.1)
+
+    pygame.mixer.quit()
+
+    os.remove(filename)
 
 
 def number_to_words(num):
@@ -98,36 +98,36 @@ def replace_numbers_with_words(input_text):
     return input_text
 
 
-def speak(response):
-    engine = pyttsx3.init()
-    voice = engine.getProperty("voices")
-    engine.setProperty("voice", voice[1].id)
-    engine.setProperty('rate', 180)
-    engine.setProperty("volume", 0.9)
-    engine.say(response)
-    engine.runAndWait()
-    # audio_generator = elevenlabs.generate(
-    #     api_key="d8a4a893da272449911c7783faefe392",
-    #     text=response,
-    #     voice="Brian",
-    #     stream=True,
-    # )
+# def speak(response):
+#     # engine = pyttsx3.init()
+#     # voice = engine.getProperty("voices")
+#     # engine.setProperty("voice", voice[1].id)
+#     # engine.setProperty('rate', 180)
+#     # engine.setProperty("volume", 0.9)
+#     # engine.say(response)
+#     # engine.runAndWait()
+#     # audio_generator = elevenlabs.generate(
+#     #     api_key="d8a4a893da272449911c7783faefe392",
+#     #     text=response,
+#     #     voice="Brian",
+#     #     stream=True,
+#     # )
 
-    # audio_data = b"".join(audio_generator)
+#     # audio_data = b"".join(audio_generator)
 
-    # if os.path.exists("audio.mp3"):
-    #     os.remove("audio.mp3")
+#     # if os.path.exists("audio.mp3"):
+#     #     os.remove("audio.mp3")
 
-    # with open("audio.mp3", "wb") as f:
-    #     f.write(audio_data)
+#     # with open("audio.mp3", "wb") as f:
+#     #     f.write(audio_data)
 
-    # play_audio("audio.mp3")
+#     # play_audio("audio.mp3")
     
-    # newText = replace_numbers_with_words(response)
+#     newText = replace_numbers_with_words(response)
     
-    # orca.synthesize_to_file(newText,"output.wav")
+#     orca.synthesize_to_file(newText,"output.wav")
 
-    # play_audio("output.wav")
+#     play_audio("output.wav")
 #     log_interaction(f"AI said: {newText}")
 
 
@@ -165,32 +165,32 @@ def speak(response):
 #         speak(f"Good Evening {user_name} , Welcome to our Health Insurance Planning System! To ensure I provide you with the best health insurance plan, I'll need some information. Your privacy is important, and all your information will be handled confidentially. Let's get started!")
 
 
-# file_path = "insurance_data.csv"
+file_path = "insurance_data.csv"
 
-# original_df = pd.read_csv(file_path)
+original_df = pd.read_csv(file_path)
 
-# imputer = SimpleImputer(strategy="mean")
+imputer = SimpleImputer(strategy="mean")
 
-# column_with_missing_values = ["age"]
+column_with_missing_values = ["age"]
 
-# original_df[column_with_missing_values] = imputer.fit_transform(
-#     original_df[column_with_missing_values]
-# )
+original_df[column_with_missing_values] = imputer.fit_transform(
+    original_df[column_with_missing_values]
+)
 
-# features = original_df.drop(["claim"], axis=1)
-# target = original_df["claim"]
+features = original_df.drop(["claim"], axis=1)
+target = original_df["claim"]
 
 
-# categorical_columns = features.select_dtypes(include=["object"]).columns
+categorical_columns = features.select_dtypes(include=["object"]).columns
 
-# features = pd.get_dummies(features, columns=categorical_columns, drop_first=True)
+features = pd.get_dummies(features, columns=categorical_columns, drop_first=True)
 
-# X_train, X_test, y_train, y_test = train_test_split(
-#     features, target, test_size=0.2, random_state=42
-# )
+X_train, X_test, y_train, y_test = train_test_split(
+    features, target, test_size=0.2, random_state=42
+)
 
-# reg = RandomForestRegressor(n_estimators=400, max_depth=4, random_state=42)
-# reg.fit(X_train, y_train)
+reg = RandomForestRegressor(n_estimators=400, max_depth=4, random_state=42)
+reg.fit(X_train, y_train)
 
 
 # def extract_gender():
@@ -347,177 +347,196 @@ def speak(response):
 #         else:
 #             return None
 
-# @app.route('/', methods=['GET'])
-# def insurance_appFun():
+@app.route('/', methods=['GET'])
+def insurance_appFun():
     
-#     speak("What is You name?")
-#     user_name = extract_name()
-
-#     greet_user(user_name)
-
-#     speak(
-#         " Firstly, age, the age is a crucial factor in tailoring the best health insurance plan for you.Can you please tell me what is your age?"
-#     )
-#     user_age = extract_numeric_value()
-
-#     speak(" Great, thank you. Now, could you share your current weight in pounds?")
-#     user_weight = round(extract_numeric_value())
-
-#     speak("Perfect. Next, can you tell me the city where you currently reside?")
-#     user_city_name = extract_city()
-#     user_city = format_name(user_city_name)
-
-#     speak("Excellent. And what is your gender?")
-#     user_gender = extract_gender()
-
-#     speak("Thank you. Now, could you share a bit about your occupation or job?")
-#     user_job = extract_job_title()
-#     user_job_title = format_name(user_job)
-
-#     speak(
-#         "Great to know. Moving on, could you please share the number of family members you'd like to include in the plan?"
-#     )
-#     user_members = extract_numeric_value()
-
-#     speak(
-#         "Perfect. Now, are there any hereditary diseases or medical conditions that run in your family that we should be aware of?please say yes or no"
-#     )
-#     user_hereditary_diseases = extract_binary_category()
-#     check_dieases = extract_hereditary_diseases(user_hereditary_diseases)
-
-#     if user_hereditary_diseases == "yes" and check_dieases == "diabetes":
-#         user_diabetes = "yes"
-#     else:
-#         user_diabetes = "no"
-
-#     speak(
-#         "Thank you for providing that information. Next, do you smoke?please say yes or no"
-#     )
-#     user_smoker = extract_binary_category()
-
-#     speak("Now, could you please share your blood pressure levels in digits?")
-#     user_bloodpressure = extract_numeric_value()
-
-#     speak(
-#         "Thank you for sharing that. Lastly, do you engage in regular exercise?please say yes or no"
-#     )
-#     user_regular_ex = extract_binary_category()
-
-#     check_dieases_lower = [disease.lower() for disease in check_dieases]
-
-#     matching_row = original_df[
-#         (original_df["age"] == user_age)
-#         & (original_df["sex"] == user_gender)
-#         & (original_df["weight"] == user_weight)
-#         & original_df["hereditary_diseases"].apply(
-#             lambda x: any(disease in x.lower() for disease in check_dieases_lower)
-#         )
-#         & (original_df["members"] == user_members)
-#         & (original_df["smoker"] == (1 if user_smoker == "yes" else 0))
-#         & (original_df["city"] == user_city)
-#         & (original_df["bloodpressure"] == user_bloodpressure)
-#         & (original_df["diabetes"] == (1 if user_diabetes == "yes" else 0))
-#         & (original_df["regular_ex"] == (1 if user_regular_ex == "yes" else 0))
-#         & (original_df["job_title"] == user_job_title)
-#     ]
-
-#     if not matching_row.empty:
-#         actual_charges = matching_row["claim"].min()
-        
-#         decimal_place = 2
-#         rounded_charge = round(actual_charges, decimal_place)
-#         speak(
-#             f"So {user_name} Based on the information you provided, the estimated insurance charges for your tailored plan are: {rounded_charge}"
-#         )
-#         speak(
-#             "Thank you for co-operate and sharing this informations. It will help us find the best health insurance plan for you."
-#         )
-#     else:
-#         user_data = pd.DataFrame(
-#             {
-#                 "age": [user_age],
-#                 "sex_male": [1 if user_gender == "male" else 0],
-#                 "weight": [user_weight],
-#                 "hereditary_diseases_NoDisease": [
-#                     1 if user_hereditary_diseases == "yes" else 0
-#                 ],
-#                 "members": [user_members],
-#                 "smoker": [1 if user_smoker == "yes" else 0],
-#                 **{
-#                     f"{col}_{user_input}": 1
-#                     for col, user_input in zip(
-#                         categorical_columns, [user_city, user_job_title]
-#                     )
-#                 },
-#                 "bloodpressure": [user_bloodpressure],
-#                 "diabetes": [1 if user_diabetes == "yes" else 0],
-#                 "regular_ex": [1 if user_regular_ex == "yes" else 0],
-#             },
-#             columns=features.columns,
-#         )
-
-#         predicted_charge = reg.predict(user_data)
-
-#         rounded_charge = round(predicted_charge[0])
-        
-#         new_entry = pd.DataFrame(
-#             {
-#                 "age": [user_age],
-#                 "sex": [user_gender],
-#                 "weight": [user_weight],
-#                 "hereditary_diseases": [
-#                     (
-#                         "NoDisease"
-#                         if user_hereditary_diseases == "no"
-#                         else ", ".join(check_dieases)
-#                     )
-#                 ][0].replace('"', ""),
-#                 "members": [user_members],
-#                 "smoker": [1 if user_smoker == "yes" else 0],
-#                 "city": [user_city],
-#                 "bloodpressure": [user_bloodpressure],
-#                 "diabetes": [1 if user_diabetes == "yes" else 0],
-#                 "regular_ex": [1 if user_regular_ex == "yes" else 0],
-#                 "job_title": [user_job_title],
-#                 "claim": [rounded_charge],
-#             },
-#             columns=original_df.columns,
-#         )
-#         updated_df = pd.concat([original_df, new_entry], ignore_index=True)
-
-#         updated_df.to_csv(file_path, index=False)
-
-#         predicted_charge_rf = reg.predict(features)
-#         mae_rf = mean_absolute_error(target, predicted_charge_rf)
-#         r2_rf = r2_score(target, predicted_charge_rf)
-
-#         # print(f"Mean Absolute Error (Random Forest Regression): {mae_rf}")
-#         # print(f"R^2 Score (Random Forest Regression): {r2_rf}")
-#         speak(
-#             f" So {user_name} Based on the information you provided, the estimated insurance charges for your tailored plan are: {rounded_charge}"
-#         )
-
-#         speak(f"Thank you {user_name} for co-operate with us and sharing all informations. It will help us find the best health insurance plan for you.")
-        
-#         return jsonify({"message": "Script executed successfully"})
+    # speak("What is You name?")
+    # user_name = extract_name()
+    user_name = 'thanos'
     
+
+    # greet_user(user_name)
+
+    # speak(
+    #     " Firstly, age, the age is a crucial factor in tailoring the best health insurance plan for you.Can you please tell me what is your age?"
+    # )
+    # user_age = extract_numeric_value()
+    user_age = 24
+    
+
+    # speak(" Great, thank you. Now, could you share your current weight in pounds?")
+    # user_weight = round(extract_numeric_value())
+    user_weight = 56
+    
+
+    # speak("Perfect. Next, can you tell me the city where you currently reside?")
+    # user_city_name = extract_city()
+    # user_city = format_name(user_city_name)
+    user_city = 'New York'
+    
+
+    # speak("Excellent. And what is your gender?")
+    # user_gender = extract_gender()
+    user_gender = 'male'
+    
+
+    # speak("Thank you. Now, could you share a bit about your occupation or job?")
+    # user_job = extract_job_title()
+    # user_job_title = format_name(user_job)
+    user_job_title = 'dancer'
+    
+
+    # speak(
+    #     "Great to know. Moving on, could you please share the number of family members you'd like to include in the plan?"
+    # )
+    # user_members = extract_numeric_value()
+    user_members = 5
+
+    # speak(
+    #     "Perfect. Now, are there any hereditary diseases or medical conditions that run in your family that we should be aware of?please say yes or no"
+    # )
+    # user_hereditary_diseases = extract_binary_category()
+    # check_dieases = extract_hereditary_diseases(user_hereditary_diseases)
+
+    # if user_hereditary_diseases == "yes" and check_dieases == "diabetes":
+    #     user_diabetes = "yes"
+    # else:
+    #     user_diabetes = "no"
+    user_hereditary_diseases = 'no'
+    check_dieases = 'no'
+    user_diabetes = 'no'
+    
+
+    # speak(
+    #     "Thank you for providing that information. Next, do you smoke?please say yes or no"
+    # )
+    # user_smoker = extract_binary_category()
+    user_smoker = 'no'
+    
+
+    # speak("Now, could you please share your blood pressure levels in digits?")
+    # user_bloodpressure = extract_numeric_value()
+    user_bloodpressure = 87
+    
+
+    # speak(
+    #     "Thank you for sharing that. Lastly, do you engage in regular exercise?please say yes or no"
+    # )
+    # user_regular_ex = extract_binary_category()
+    user_regular_ex = 'no'
+    
+
+    check_dieases_lower = [disease.lower() for disease in check_dieases]
+
+    matching_row = original_df[
+        (original_df["age"] == user_age)
+        & (original_df["sex"] == user_gender)
+        & (original_df["weight"] == user_weight)
+        & original_df["hereditary_diseases"].apply(
+            lambda x: any(disease in x.lower() for disease in check_dieases_lower)
+        )
+        & (original_df["members"] == user_members)
+        & (original_df["smoker"] == (1 if user_smoker == "yes" else 0))
+        & (original_df["city"] == user_city)
+        & (original_df["bloodpressure"] == user_bloodpressure)
+        & (original_df["diabetes"] == (1 if user_diabetes == "yes" else 0))
+        & (original_df["regular_ex"] == (1 if user_regular_ex == "yes" else 0))
+        & (original_df["job_title"] == user_job_title)
+    ]
+
+    if not matching_row.empty:
+        actual_charges = matching_row["claim"].min()
+        
+        decimal_place = 2
+        rounded_charge = round(actual_charges, decimal_place)
+        # speak(
+        #     f"So {user_name} Based on the information you provided, the estimated insurance charges for your tailored plan are: {rounded_charge}"
+        # )
+        # speak(
+        #     "Thank you for co-operate and sharing this informations. It will help us find the best health insurance plan for you."
+        # )
+    else:
+        user_data = pd.DataFrame(
+            {
+                "age": [user_age],
+                "sex_male": [1 if user_gender == "male" else 0],
+                "weight": [user_weight],
+                "hereditary_diseases_NoDisease": [
+                    1 if user_hereditary_diseases == "yes" else 0
+                ],
+                "members": [user_members],
+                "smoker": [1 if user_smoker == "yes" else 0],
+                **{
+                    f"{col}_{user_input}": 1
+                    for col, user_input in zip(
+                        categorical_columns, [user_city, user_job_title]
+                    )
+                },
+                "bloodpressure": [user_bloodpressure],
+                "diabetes": [1 if user_diabetes == "yes" else 0],
+                "regular_ex": [1 if user_regular_ex == "yes" else 0],
+            },
+            columns=features.columns,
+        )
+
+        predicted_charge = reg.predict(user_data)
+
+        rounded_charge = round(predicted_charge[0])
+        
+        new_entry = pd.DataFrame(
+            {
+                "age": [user_age],
+                "sex": [user_gender],
+                "weight": [user_weight],
+                "hereditary_diseases": [
+                    (
+                        "NoDisease"
+                        if user_hereditary_diseases == "no"
+                        else ", ".join(check_dieases)
+                    )
+                ][0].replace('"', ""),
+                "members": [user_members],
+                "smoker": [1 if user_smoker == "yes" else 0],
+                "city": [user_city],
+                "bloodpressure": [user_bloodpressure],
+                "diabetes": [1 if user_diabetes == "yes" else 0],
+                "regular_ex": [1 if user_regular_ex == "yes" else 0],
+                "job_title": [user_job_title],
+                "claim": [rounded_charge],
+            },
+            columns=original_df.columns,
+        )
+        updated_df = pd.concat([original_df, new_entry], ignore_index=True)
+
+        updated_df.to_csv(file_path, index=False)
+
+        predicted_charge_rf = reg.predict(features)
+        mae_rf = mean_absolute_error(target, predicted_charge_rf)
+        r2_rf = r2_score(target, predicted_charge_rf)
+
+        # print(f"Mean Absolute Error (Random Forest Regression): {mae_rf}")
+        # print(f"R^2 Score (Random Forest Regression): {r2_rf}")
+        # speak(
+        #     f" So {user_name} Based on the information you provided, the estimated insurance charges for your tailored plan are: {rounded_charge}"
+        # )
+
+        # speak(f"Thank you {user_name} for co-operate with us and sharing all informations. It will help us find the best health insurance plan for you.")
+        
+        return f"So {user_name} Based on the information you provided, the estimated insurance charges for your tailored plan are: {rounded_charge} "    
     
 # # if __name__ == "__main__":
 # #     app.run(debug=True)
 
-def play_audio(filename):
-    pygame.mixer.init()
-    pygame.mixer.music.load(filename)
-    pygame.mixer.music.play()
+# def speak(response):
+#     engine = pyttsx3.init()
+#     voice = engine.getProperty("voices")
+#     engine.setProperty("voice", voice[1].id)
+#     engine.setProperty('rate', 180)
+#     engine.setProperty("volume", 0.9)
+#     engine.say(response)
+#     engine.runAndWait()
 
-    while pygame.mixer.music.get_busy():
-        time.sleep(0.1)
-
-    pygame.mixer.quit()
-
-    os.remove(filename)
-
-@app.route('/', methods=['GET'])
-def insurance_test():
-    speak("hello thanos you api is hosted successfully")
-    return speak("hello thanos you api is hosted successfully")
+# @app.route('/', methods=['GET'])
+# def insurance_test():
+#     speak("hello thanos you api is hosted successfully")
+#     return speak("hello thanos you api is hosted successfully")
