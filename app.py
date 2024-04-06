@@ -17,7 +17,7 @@ app = Flask(__name__)
 
 # current_session_file_path = None
 
-# orca = pvorca.create(access_key='89BlxJKCyiH/Eye4zhS74DxMibVpYlj/6qkLLw90NCm+ICw+AKYZqg==')
+orca = pvorca.create(access_key='89BlxJKCyiH/Eye4zhS74DxMibVpYlj/6qkLLw90NCm+ICw+AKYZqg==')
 
 # def log_interaction(log_text):
 #     global current_session_file_path
@@ -55,78 +55,78 @@ app = Flask(__name__)
 #     os.remove(filename)
 
 
-# def number_to_words(num):
-#     # Define lists for ones, tens, and special cases up to 19
-#     ones = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine']
-#     teens = ['ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen']
-#     tens = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety']
+def number_to_words(num):
+    # Define lists for ones, tens, and special cases up to 19
+    ones = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine']
+    teens = ['ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen']
+    tens = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety']
 
-#     # Define the magnitude names
-#     magnitudes = ['', 'thousand', 'million', 'billion', 'trillion', 'quadrillion', 'quintillion', 'sextillion', 'septillion', 'octillion', 'nonillion', 'decillion']
+    # Define the magnitude names
+    magnitudes = ['', 'thousand', 'million', 'billion', 'trillion', 'quadrillion', 'quintillion', 'sextillion', 'septillion', 'octillion', 'nonillion', 'decillion']
 
-#     def convert_below_1000(n):
-#         if n == 0:
-#             return ''
-#         elif n < 10:
-#             return ones[n]
-#         elif n < 20:
-#             return teens[n - 10]
-#         elif n < 100:
-#             return tens[n // 10] + ' ' + convert_below_1000(n % 10)
-#         else:
-#             return ones[n // 100] + ' hundred ' + convert_below_1000(n % 100)
+    def convert_below_1000(n):
+        if n == 0:
+            return ''
+        elif n < 10:
+            return ones[n]
+        elif n < 20:
+            return teens[n - 10]
+        elif n < 100:
+            return tens[n // 10] + ' ' + convert_below_1000(n % 10)
+        else:
+            return ones[n // 100] + ' hundred ' + convert_below_1000(n % 100)
 
-#     if num == 0:
-#         return 'zero'
+    if num == 0:
+        return 'zero'
 
-#     num_chunks = []
-#     while num:
-#         num_chunks.append(num % 1000)
-#         num //= 1000
+    num_chunks = []
+    while num:
+        num_chunks.append(num % 1000)
+        num //= 1000
 
-#     words_chunks = [convert_below_1000(chunk) + ' ' + magnitudes[i] for i, chunk in enumerate(num_chunks)]
-#     words = ' '.join(words_chunks[::-1])  
+    words_chunks = [convert_below_1000(chunk) + ' ' + magnitudes[i] for i, chunk in enumerate(num_chunks)]
+    words = ' '.join(words_chunks[::-1])  
 
-#     return words.strip()
+    return words.strip()
     
-# def replace_numbers_with_words(input_text):
-#     numeric_values = re.findall(r'\b\d+\b', input_text)
-#     for num in numeric_values:
-#         num_as_text = number_to_words(int(num))
-#         input_text = input_text.replace(num, num_as_text)
-#     return input_text
+def replace_numbers_with_words(input_text):
+    numeric_values = re.findall(r'\b\d+\b', input_text)
+    for num in numeric_values:
+        num_as_text = number_to_words(int(num))
+        input_text = input_text.replace(num, num_as_text)
+    return input_text
 
 
-# def speak(response):
-#     # engine = pyttsx3.init()
-#     # voice = engine.getProperty("voices")
-#     # engine.setProperty("voice", voice[1].id)
-#     # engine.setProperty('rate', 180)
-#     # engine.setProperty("volume", 0.9)
-#     # engine.say(response)
-#     # engine.runAndWait()
-#     # audio_generator = elevenlabs.generate(
-#     #     api_key="d8a4a893da272449911c7783faefe392",
-#     #     text=response,
-#     #     voice="Brian",
-#     #     stream=True,
-#     # )
+def speak(response):
+    # engine = pyttsx3.init()
+    # voice = engine.getProperty("voices")
+    # engine.setProperty("voice", voice[1].id)
+    # engine.setProperty('rate', 180)
+    # engine.setProperty("volume", 0.9)
+    # engine.say(response)
+    # engine.runAndWait()
+    # audio_generator = elevenlabs.generate(
+    #     api_key="d8a4a893da272449911c7783faefe392",
+    #     text=response,
+    #     voice="Brian",
+    #     stream=True,
+    # )
 
-#     # audio_data = b"".join(audio_generator)
+    # audio_data = b"".join(audio_generator)
 
-#     # if os.path.exists("audio.mp3"):
-#     #     os.remove("audio.mp3")
+    # if os.path.exists("audio.mp3"):
+    #     os.remove("audio.mp3")
 
-#     # with open("audio.mp3", "wb") as f:
-#     #     f.write(audio_data)
+    # with open("audio.mp3", "wb") as f:
+    #     f.write(audio_data)
 
-#     # play_audio("audio.mp3")
+    # play_audio("audio.mp3")
     
-#     newText = replace_numbers_with_words(response)
+    newText = replace_numbers_with_words(response)
     
-#     orca.synthesize_to_file(newText,"output.wav")
+    orca.synthesize_to_file(newText,"output.wav")
 
-#     play_audio("output.wav")
+    play_audio("output.wav")
 #     log_interaction(f"AI said: {newText}")
 
 
@@ -504,7 +504,19 @@ app = Flask(__name__)
 # # if __name__ == "__main__":
 # #     app.run(debug=True)
 
+def play_audio(filename):
+    pygame.mixer.init()
+    pygame.mixer.music.load(filename)
+    pygame.mixer.music.play()
+
+    while pygame.mixer.music.get_busy():
+        time.sleep(0.1)
+
+    pygame.mixer.quit()
+
+    os.remove(filename)
 
 @app.route('/', methods=['GET'])
 def insurance_test():
-    return "hiii"
+    speak("hello thanos you api is hosted successfully")
+    return speak("hello thanos you api is hosted successfully")
