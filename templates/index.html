@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speech Recognition and Synthesis</title>
+</head>
+<body>
+    <h1>Speech Recognition and Synthesis</h1>
+    <button id="startRecognition">Start Recognition</button>
+    <div id="output"></div>
+
+    <script>
+        const synthesis = window.speechSynthesis; 
+        let currentQuestion = 0;
+        let responses = {};
+
+        function askQuestion(action) {
+            fetch('/process_audio', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({action: action})
+            })
+            .then(response => response.json())
+            .then(data => {
+                const response_text = data.response_text;
+                const askQuestionUtterance = new SpeechSynthesisUtterance(response_text);
+                askQuestionUtterance.onend = () => {
+                    const recognition = new webkitSpeechRecognition(); 
+                    recognition.lang = 'en-US'; 
+                    recognition.continuous = false; 
+    
+                    // Event handler for when speech is recognized
+                    recognition.onresult = (event) => {
+                        const transcript = event.results[0][0].transcript;
+                        document.getElementById('output').textContent = transcript;
+                        responses[action] = transcript;
+                        currentQuestion++;
+                        if (currentQuestion < questions.length) {
+                            askQuestion(questions[currentQuestion]);
+                        } else {
+                            processResponses();
+                        }
+                    };
+    
+                    recognition.start(); 
+                };
+    
+                synthesis.speak(askQuestionUtterance); 
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function processResponses() {
+            // Send all responses to backend for storage
+            fetch('/store_responses', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(responses)
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Once responses are stored, backend sends the final message
+                const finalMessage = data.final_message;
+                const finalUtterance = new SpeechSynthesisUtterance(finalMessage);
+                synthesis.speak(finalUtterance);
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    
+        const questions = ['ask_name', 'ask_age', 'ask_gender', 'ask_occupation'];
+    
+        document.getElementById('startRecognition').addEventListener('click', () => {
+            currentQuestion = 0;
+            responses = {};
+            askQuestion(questions[currentQuestion]);
+        });
+    </script>
+</body>
+</html>
