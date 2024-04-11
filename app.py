@@ -491,135 +491,207 @@
 # # if __name__ == "__main__":
 # #     app.run(debug=True)
 
-from flask import Flask, request, jsonify, render_template
-import re
-import pandas as pd
+# from flask import Flask, request, jsonify, render_template
+# import re
+# import pandas as pd
+# import pvorca
+
+
+# app = Flask(__name__)
+
+# orca = pvorca.create(access_key='89BlxJKCyiH/Eye4zhS74DxMibVpYlj/6qkLLw90NCm+ICw+AKYZqg==')
+
+
+# def number_to_words(num):
+#     # Define lists for ones, tens, and special cases up to 19
+#     ones = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine']
+#     teens = ['ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen']
+#     tens = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety']
+
+#     # Define the magnitude names
+#     magnitudes = ['', 'thousand', 'million', 'billion', 'trillion', 'quadrillion', 'quintillion', 'sextillion', 'septillion', 'octillion', 'nonillion', 'decillion']
+
+#     def convert_below_1000(n):
+#         if n == 0:
+#             return ''
+#         elif n < 10:
+#             return ones[n]
+#         elif n < 20:
+#             return teens[n - 10]
+#         elif n < 100:
+#             return tens[n // 10] + ' ' + convert_below_1000(n % 10)
+#         else:
+#             return ones[n // 100] + ' hundred ' + convert_below_1000(n % 100)
+
+#     if num == 0:
+#         return 'zero'
+
+#     num_chunks = []
+#     while num:
+#         num_chunks.append(num % 1000)
+#         num //= 1000
+
+#     words_chunks = [convert_below_1000(chunk) + ' ' + magnitudes[i] for i, chunk in enumerate(num_chunks)]
+#     words = ' '.join(words_chunks[::-1])  
+
+#     return words.strip()
+    
+# def replace_numbers_with_words(input_text):
+#     numeric_values = re.findall(r'\b\d+\b', input_text)
+#     for num in numeric_values:
+#         num_as_text = number_to_words(int(num))
+#         input_text = input_text.replace(num, num_as_text)
+#     return input_text
+
+
+# def speak(response):
+#     newText = replace_numbers_with_words(response)
+    
+#     orca.synthesize_to_file(newText,"output.wav")
+
+
+# def extract_name(input_text):
+#     matches_pattern = re.findall(r"my name is (\w+)", input_text, re.IGNORECASE)
+
+#     if matches_pattern:
+#         return matches_pattern[0]
+#     else:
+#         matches_words = re.findall(r"\b\w+\b", input_text)
+#         valid_names = [
+#             match
+#             for match in matches_words
+#             if match.lower() not in ["is", "my", "name"] and len(match) > 1
+#         ]
+
+#         if valid_names:
+#             return valid_names[0]
+#         else:
+#             return None
+
+# def extract_numeric_value(user_input):
+
+#     numeric_values = []
+#     numeric_str = ""
+#     number_mapping = {
+#         "zero": "0",
+#         "one": "1",
+#         "two": "2",
+#         "three": "3",
+#         "four": "4",
+#         "five": "5",
+#         "six": "6",
+#         "seven": "7",
+#         "eight": "8",
+#         "nine": "9",
+#         "ten": "10",
+#     }
+
+#     for word in user_input.lower().split():
+#         if word.isdigit() or word.replace(".", "", 1).isdigit():
+#             numeric_str += word
+#         elif word in number_mapping:
+#             numeric_str += number_mapping[word]
+#         elif numeric_str:
+#             numeric_values.append(numeric_str)
+#             numeric_str = ""
+
+#     if numeric_str:
+#         numeric_values.append(numeric_str)
+
+#     try:
+#         last_sequence = numeric_values[-1]
+#         numeric_value = (
+#             float(last_sequence) if "." in last_sequence else int(last_sequence)
+#         )
+#         return numeric_value
+#     except ValueError:
+#         return extract_numeric_value()
+#     except IndexError:
+#         return extract_numeric_value()
+    
+# def extract_gender(user_input):
+    
+
+#     if "male" in user_input:
+#         gender = "male"
+#     elif "female" in user_input:
+#         gender = "female"
+#     else:
+#         return extract_gender()
+
+#     return gender
+
+# def extract_job_title(user_input):
+    
+#     file_path = "insurance_data.csv"
+
+#     original_df = pd.read_csv(file_path)
+
+#     job_titles = original_df["job_title"].unique()
+#     for job_title in job_titles:
+#         if job_title.lower() in user_input:
+#             return job_title
+
+#     return extract_job_title()
+
+# stored_responses = {}
+
+# # Dictionary to map actions to response texts
+# responses_dict = {
+#     'ask_name': "What is your name?",
+#     'ask_age': "How old are you?",
+#     'ask_gender': "What is your gender?",
+#     'ask_occupation': "What is your occupation?",
+# }
+
+# @app.route('/')
+# def index():
+#     return render_template("index.html")
+
+# @app.route('/process_audio', methods=['POST'])
+# def process_audio():
+#     action = request.json.get('action', None)
+    
+#     # Get the response text from the dictionary
+#     response_text = responses_dict.get(action, "Invalid action.")
+
+#     return jsonify({'response_text': response_text})
+
+# @app.route('/store_responses', methods=['POST'])
+# def store_responses():
+#     global stored_responses
+#     responses = request.json
+#     stored_responses = responses
+
+#     name = extract_name(stored_responses['ask_name'])
+#     age = extract_numeric_value(stored_responses['ask_age'])
+#     gender = extract_gender(stored_responses['ask_gender'])
+#     job_name = extract_job_title(stored_responses['ask_occupation'])
+    
+#     final_message = f"Alright, let's summarize: {name} is {age} years old, " \
+#                 f"and identifies as {gender}. As for occupation, {name} is " \
+#                 f"pursuing {job_name}. Quite an interesting combination!"
+    
+#     return jsonify({'final_message': final_message})
+
+# if __name__ == '__main__':
+#     app.run(debug=True)
+
+
+from flask import Flask, send_file
+import pvorca
 
 app = Flask(__name__)
 
-def extract_name(input_text):
-    matches_pattern = re.findall(r"my name is (\w+)", input_text, re.IGNORECASE)
+orca = pvorca.create(access_key='89BlxJKCyiH/Eye4zhS74DxMibVpYlj/6qkLLw90NCm+ICw+AKYZqg==')
 
-    if matches_pattern:
-        return matches_pattern[0]
-    else:
-        matches_words = re.findall(r"\b\w+\b", input_text)
-        valid_names = [
-            match
-            for match in matches_words
-            if match.lower() not in ["is", "my", "name"] and len(match) > 1
-        ]
-
-        if valid_names:
-            return valid_names[0]
-        else:
-            return None
-
-def extract_numeric_value(user_input):
-
-    numeric_values = []
-    numeric_str = ""
-    number_mapping = {
-        "zero": "0",
-        "one": "1",
-        "two": "2",
-        "three": "3",
-        "four": "4",
-        "five": "5",
-        "six": "6",
-        "seven": "7",
-        "eight": "8",
-        "nine": "9",
-        "ten": "10",
-    }
-
-    for word in user_input.lower().split():
-        if word.isdigit() or word.replace(".", "", 1).isdigit():
-            numeric_str += word
-        elif word in number_mapping:
-            numeric_str += number_mapping[word]
-        elif numeric_str:
-            numeric_values.append(numeric_str)
-            numeric_str = ""
-
-    if numeric_str:
-        numeric_values.append(numeric_str)
-
-    try:
-        last_sequence = numeric_values[-1]
-        numeric_value = (
-            float(last_sequence) if "." in last_sequence else int(last_sequence)
-        )
-        return numeric_value
-    except ValueError:
-        return extract_numeric_value()
-    except IndexError:
-        return extract_numeric_value()
+@app.route('/', methods=['GET'])
+def get_audio():
     
-def extract_gender(user_input):
+    newText = "Hello My name is thanos and i am from Titan planet"   
+    orca.synthesize_to_file(newText,"output.wav")
     
-
-    if "male" in user_input:
-        gender = "male"
-    elif "female" in user_input:
-        gender = "female"
-    else:
-        return extract_gender()
-
-    return gender
-
-def extract_job_title(user_input):
-    
-    file_path = "insurance_data.csv"
-
-    original_df = pd.read_csv(file_path)
-
-    job_titles = original_df["job_title"].unique()
-    for job_title in job_titles:
-        if job_title.lower() in user_input:
-            return job_title
-
-    return extract_job_title()
-
-stored_responses = {}
-
-# Dictionary to map actions to response texts
-responses_dict = {
-    'ask_name': "What is your name?",
-    'ask_age': "How old are you?",
-    'ask_gender': "What is your gender?",
-    'ask_occupation': "What is your occupation?",
-}
-
-@app.route('/')
-def index():
-    return render_template("index.html")
-
-@app.route('/process_audio', methods=['POST'])
-def process_audio():
-    action = request.json.get('action', None)
-    
-    # Get the response text from the dictionary
-    response_text = responses_dict.get(action, "Invalid action.")
-
-    return jsonify({'response_text': response_text})
-
-@app.route('/store_responses', methods=['POST'])
-def store_responses():
-    global stored_responses
-    responses = request.json
-    stored_responses = responses
-
-    name = extract_name(stored_responses['ask_name'])
-    age = extract_numeric_value(stored_responses['ask_age'])
-    gender = extract_gender(stored_responses['ask_gender'])
-    job_name = extract_job_title(stored_responses['ask_occupation'])
-    # Generate the final message
-    final_message = f"Alright, let's summarize: {name} is {age} years old, " \
-                f"and identifies as {gender}. As for occupation, {name} is " \
-                f"pursuing {job_name}. Quite an interesting combination!"
-    
-    return jsonify({'final_message': final_message})
+    return send_file("output.wav", as_attachment=False, mimetype='audio/wav')
 
 if __name__ == '__main__':
     app.run(debug=True)

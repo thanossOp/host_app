@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+{% comment %} <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -78,6 +78,32 @@
             currentQuestion = 0;
             responses = {};
             askQuestion(questions[currentQuestion]);
+        });
+    </script>
+</body>
+</html> {% endcomment %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Play Audio</title>
+</head>
+<body>
+    <button id="playBtn">Play Audio</button>
+    <script>
+        document.getElementById("playBtn").addEventListener("click", function() {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', '/get_audio', true);
+            xhr.responseType = 'blob'; // Set the response type to blob
+            xhr.onload = function(e) {
+                if (this.status == 200) {
+                    var blob = this.response;
+                    var audio = new Audio();
+                    audio.src = window.URL.createObjectURL(blob);
+                    audio.play();
+                }
+            };
+            xhr.send();
         });
     </script>
 </body>
