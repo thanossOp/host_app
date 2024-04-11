@@ -1,4 +1,4 @@
-{% comment %} <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -8,103 +8,75 @@
 <body>
     <h1>Speech Recognition and Synthesis</h1>
     <button id="startRecognition">Start Recognition</button>
+    <audio id="audioplayer"></audio>
     <div id="output"></div>
-
     <script>
-        const synthesis = window.speechSynthesis; 
-        let currentQuestion = 0;
-        let responses = {};
+        let isWaitingForResponse = false
+        const startRecognition = document.getElementById("startRecognition");
+        const audioplayer = document.getElementById("audioplayer");
+        let questionId = 1;
+        let recognition;
 
-        function askQuestion(action) {
-            fetch('/process_audio', {
-                method: 'POST',
+        function fetchQuestion() {
+            fetch("/jsonroute", {
+                method: "POST",
+                body: JSON.stringify({ questionId: questionId }),
                 headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({action: action})
-            })
-            .then(response => response.json())
-            .then(data => {
-                const response_text = data.response_text;
-                const askQuestionUtterance = new SpeechSynthesisUtterance(response_text);
-                askQuestionUtterance.onend = () => {
-                    const recognition = new webkitSpeechRecognition(); 
-                    recognition.lang = 'en-US'; 
-                    recognition.continuous = false; 
-    
-                    // Event handler for when speech is recognized
-                    recognition.onresult = (event) => {
-                        const transcript = event.results[0][0].transcript;
-                        document.getElementById('output').textContent = transcript;
-                        responses[action] = transcript;
-                        currentQuestion++;
-                        if (currentQuestion < questions.length) {
-                            askQuestion(questions[currentQuestion]);
-                        } else {
-                            processResponses();
-                        }
-                    };
-    
-                    recognition.start(); 
-                };
-    
-                synthesis.speak(askQuestionUtterance); 
-            })
-            .catch(error => console.error('Error:', error));
-        }
-
-        function processResponses() {
-            // Send all responses to backend for storage
-            fetch('/store_responses', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(responses)
-            })
-            .then(response => response.json())
-            .then(data => {
-                // Once responses are stored, backend sends the final message
-                const finalMessage = data.final_message;
-                const finalUtterance = new SpeechSynthesisUtterance(finalMessage);
-                synthesis.speak(finalUtterance);
-            })
-            .catch(error => console.error('Error:', error));
-        }
-    
-        const questions = ['ask_name', 'ask_age', 'ask_gender', 'ask_occupation'];
-    
-        document.getElementById('startRecognition').addEventListener('click', () => {
-            currentQuestion = 0;
-            responses = {};
-            askQuestion(questions[currentQuestion]);
-        });
-    </script>
-</body>
-</html> {% endcomment %}
-
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Play Audio</title>
-</head>
-<body>
-    <button id="playBtn">Play Audio</button>
-    <script>
-        document.getElementById("playBtn").addEventListener("click", function() {
-            var xhr = new XMLHttpRequest();
-            xhr.open('GET', '/get_audio', true);
-            xhr.responseType = 'blob'; // Set the response type to blob
-            xhr.onload = function(e) {
-                if (this.status == 200) {
-                    var blob = this.response;
-                    var audio = new Audio();
-                    audio.src = window.URL.createObjectURL(blob);
-                    audio.play();
+                    "Content-Type": "application/json"
                 }
-            };
-            xhr.send();
+            })
+            .then(response => {
+                if (!response.ok) {
+                    recognition.stop();
+                    audioplayer.pause();
+                    return Promise.reject("Question not found");
+                }
+                return response.blob();
+            })
+            .then(data => {
+                audioplayer.src = URL.createObjectURL(data);
+                audioplayer.play();
+                startSpeechRecognition();
+            })
+            .catch(error => {
+                console.error(error);
+            });
+        }
+        function startSpeechRecognition() {
+             recognition = new webkitSpeechRecognition();
+            recognition.lang = 'en-US';
+
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                sendUserResponse(transcript);
+            }
+
+            recognition.start();
+        }
+
+        function sendUserResponse(response) {
+            fetch("/user-response", {
+                method: "POST",
+                body: JSON.stringify({ questionId: questionId, response: response }),
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                questionId = data.nextQuestionId;
+                fetchQuestion();
+            });
+        }
+
+        startRecognition.addEventListener("click", fetchQuestion);
+        audioplayer.addEventListener("ended", () => {
+            console.log("r"); 
+            if (isWaitingForResponse) {
+            fetchjson();
+          }
         });
     </script>
 </body>
 </html>
+
