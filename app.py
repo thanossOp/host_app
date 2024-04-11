@@ -492,10 +492,104 @@
 # #     app.run(debug=True)
 
 from flask import Flask, request, jsonify, render_template
+import re
+import pandas as pd
 
 app = Flask(__name__)
 
+def extract_name(input_text):
+    matches_pattern = re.findall(r"my name is (\w+)", input_text, re.IGNORECASE)
+
+    if matches_pattern:
+        return matches_pattern[0]
+    else:
+        matches_words = re.findall(r"\b\w+\b", input_text)
+        valid_names = [
+            match
+            for match in matches_words
+            if match.lower() not in ["is", "my", "name"] and len(match) > 1
+        ]
+
+        if valid_names:
+            return valid_names[0]
+        else:
+            return None
+
+def extract_numeric_value(user_input):
+
+    numeric_values = []
+    numeric_str = ""
+    number_mapping = {
+        "zero": "0",
+        "one": "1",
+        "two": "2",
+        "three": "3",
+        "four": "4",
+        "five": "5",
+        "six": "6",
+        "seven": "7",
+        "eight": "8",
+        "nine": "9",
+        "ten": "10",
+    }
+
+    for word in user_input.lower().split():
+        if word.isdigit() or word.replace(".", "", 1).isdigit():
+            numeric_str += word
+        elif word in number_mapping:
+            numeric_str += number_mapping[word]
+        elif numeric_str:
+            numeric_values.append(numeric_str)
+            numeric_str = ""
+
+    if numeric_str:
+        numeric_values.append(numeric_str)
+
+    try:
+        last_sequence = numeric_values[-1]
+        numeric_value = (
+            float(last_sequence) if "." in last_sequence else int(last_sequence)
+        )
+        return numeric_value
+    except ValueError:
+        return extract_numeric_value()
+    except IndexError:
+        return extract_numeric_value()
+    
+def extract_gender(user_input):
+    
+
+    if "male" in user_input:
+        gender = "male"
+    elif "female" in user_input:
+        gender = "female"
+    else:
+        return extract_gender()
+
+    return gender
+
+def extract_job_title(user_input):
+    
+    file_path = "insurance_data.csv"
+
+    original_df = pd.read_csv(file_path)
+
+    job_titles = original_df["job_title"].unique()
+    for job_title in job_titles:
+        if job_title.lower() in user_input:
+            return job_title
+
+    return extract_job_title()
+
 stored_responses = {}
+
+# Dictionary to map actions to response texts
+responses_dict = {
+    'ask_name': "What is your name?",
+    'ask_age': "How old are you?",
+    'ask_gender': "What is your gender?",
+    'ask_occupation': "What is your occupation?",
+}
 
 @app.route('/')
 def index():
@@ -505,16 +599,8 @@ def index():
 def process_audio():
     action = request.json.get('action', None)
     
-    if action == 'ask_name':
-        response_text = "What is your name?"
-    elif action == 'ask_age':
-        response_text = "How old are you?"
-    elif action == 'ask_gender':
-        response_text = "What is your gender?"
-    elif action == 'ask_occupation':
-        response_text = "What is your occupation?"
-    else:
-        response_text = "Invalid action."
+    # Get the response text from the dictionary
+    response_text = responses_dict.get(action, "Invalid action.")
 
     return jsonify({'response_text': response_text})
 
@@ -524,10 +610,14 @@ def store_responses():
     responses = request.json
     stored_responses = responses
 
+    name = extract_name(stored_responses['ask_name'])
+    age = extract_numeric_value(stored_responses['ask_age'])
+    gender = extract_gender(stored_responses['ask_gender'])
+    job_name = extract_job_title(stored_responses['ask_occupation'])
     # Generate the final message
-    final_message = f"Alright, let's summarize: {stored_responses['ask_name']} is {stored_responses['ask_age']} years old, " \
-                f"and identifies as {stored_responses['ask_gender']}. As for occupation, {stored_responses['ask_name']} is " \
-                f"pursuing {stored_responses['ask_occupation']}. Quite an interesting combination!"
+    final_message = f"Alright, let's summarize: {name} is {age} years old, " \
+                f"and identifies as {gender}. As for occupation, {name} is " \
+                f"pursuing {job_name}. Quite an interesting combination!"
     
     return jsonify({'final_message': final_message})
 
