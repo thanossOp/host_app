@@ -1,82 +1,115 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Speech Recognition and Synthesis</title>
-</head>
-<body>
+  </head>
+  <body>
     <h1>Speech Recognition and Synthesis</h1>
     <button id="startRecognition">Start Recognition</button>
     <audio id="audioplayer"></audio>
     <div id="output"></div>
     <script>
-        let isWaitingForResponse = false
-        const startRecognition = document.getElementById("startRecognition");
-        const audioplayer = document.getElementById("audioplayer");
-        let questionId = 1;
-        let recognition;
+      let questionId = '1';
+      const startRecognition = document.getElementById("startRecognition");
+      const audioplayer = document.getElementById("audioplayer");
+      let recognition;
 
-        function fetchQuestion() {
-            fetch("/jsonroute", {
-                method: "POST",
-                body: JSON.stringify({ questionId: questionId }),
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            })
-            .then(response => {
-                if (!response.ok) {
-                    recognition.stop();
-                    audioplayer.pause();
-                    return Promise.reject("Question not found");
-                }
-                return response.blob();
-            })
-            .then(data => {
-                audioplayer.src = URL.createObjectURL(data);
-                audioplayer.play();
-                startSpeechRecognition();
-            })
-            .catch(error => {
-                console.error(error);
-            });
-        }
-        function startSpeechRecognition() {
-             recognition = new webkitSpeechRecognition();
-            recognition.lang = 'en-US';
-
-            recognition.onresult = function(event) {
-                const transcript = event.results[0][0].transcript;
-                sendUserResponse(transcript);
+      function fetchQuestion() {
+        fetch("/jsonroute", {
+          method: "POST",
+          body: JSON.stringify({ questionId: questionId }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+          .then((response) => {
+            if (!response.ok) {
+              return Promise.reject("Question not found");
             }
+            return response.blob();
+          })
+          .then((data) => {
+            audioplayer.src = URL.createObjectURL(data);
+            audioplayer.play();
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      }
 
-            recognition.start();
-        }
+      function startSpeechRecognition() {
+        recognition = new webkitSpeechRecognition();
+        recognition.lang = "en-US";
 
-        function sendUserResponse(response) {
-            fetch("/user-response", {
-                method: "POST",
-                body: JSON.stringify({ questionId: questionId, response: response }),
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                questionId = data.nextQuestionId;
+        recognition.onresult = function (event) {
+          const transcript = event.results[0][0].transcript;
+          sendUserResponse(transcript);
+        };
+
+        recognition.start();
+      }
+
+      function sendUserResponse(response) {
+        recognition.stop(); // Stop recognition after response is received
+        fetch("/user-response", {
+          method: "POST",
+          body: JSON.stringify({ questionId: questionId, response: response }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+          .then((response) => {
+            if (response.headers.get("content-type") === "audio/wav") {
+              return response.blob(); // Return audio blob
+            } else {
+              return response.json(); // Parse JSON response
+            }
+          })
+          .then((data) => {
+            if (typeof data === "object") {
+              // JSON response
+              questionId = data.nextQuestionId;
+              if (questionId === "3") {
+                generateMessage();
+              } else {
                 fetchQuestion();
-            });
+              }
+            } else {
+              // Audio file response
+              audioplayer.src = URL.createObjectURL(data);
+              audioplayer.play();
+            }
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      }
+
+      function generateMessage() {
+        fetch("/generate-message")
+          .then((response) => {
+            if (!response.ok) {
+              return Promise.reject("Failed to generate message");
+            }
+            return response.blob();
+          })
+          .then((data) => {
+            audioplayer.src = URL.createObjectURL(data);
+            audioplayer.play();
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      }
+
+      startRecognition.addEventListener("click", fetchQuestion);
+      audioplayer.addEventListener("ended", () => {
+        if (questionId !== "3") {
+          startSpeechRecognition(); 
         }
-
-        startRecognition.addEventListener("click", fetchQuestion);
-        audioplayer.addEventListener("ended", () => {
-            console.log("r"); 
-            if (isWaitingForResponse) {
-            fetchjson();
-          }
-        });
+      });
     </script>
-</body>
+  </body>
 </html>
-
